@@ -1,6 +1,6 @@
 'use client';
 
-import { ALL_TYPES, getTypeColor, capitalize } from '@/lib/utils';
+import { ALL_TYPES, getTypeColor, getTypeIcon, capitalize } from '@/lib/utils';
 
 interface TypeFilterProps {
   selectedTypes: string[];
@@ -28,6 +28,7 @@ export default function TypeFilter({ selectedTypes, onTypeToggle, onClearFilters
         {ALL_TYPES.map((type) => {
           const isSelected = selectedTypes.includes(type);
           const colorClass = getTypeColor(type);
+          const icon = getTypeIcon(type);
           
           return (
             <button
@@ -35,7 +36,7 @@ export default function TypeFilter({ selectedTypes, onTypeToggle, onClearFilters
               onClick={() => onTypeToggle(type)}
               className={`
                 px-4 py-2 rounded-full font-medium text-white text-sm
-                transition-all duration-200 transform
+                transition-all duration-200 transform flex items-center gap-2
                 ${colorClass}
                 ${isSelected 
                   ? 'ring-4 ring-offset-2 ring-blue-400 scale-105 shadow-lg' 
@@ -43,7 +44,8 @@ export default function TypeFilter({ selectedTypes, onTypeToggle, onClearFilters
                 }
               `}
             >
-              {capitalize(type)}
+              <span className="text-lg">{icon}</span>
+              <span>{capitalize(type)}</span>
             </button>
           );
         })}

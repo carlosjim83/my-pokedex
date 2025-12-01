@@ -20,6 +20,28 @@ export const TYPE_COLORS: { [key: string]: string } = {
   fairy: 'bg-pink-300',
 };
 
+// Type icons mapping
+export const TYPE_ICONS: { [key: string]: string } = {
+  normal: '⭐',
+  fire: '🔥',
+  water: '💧',
+  electric: '⚡',
+  grass: '🌿',
+  ice: '❄️',
+  fighting: '👊',
+  poison: '☠️',
+  ground: '🌍',
+  flying: '🦅',
+  psychic: '🔮',
+  bug: '🐛',
+  rock: '🪨',
+  ghost: '👻',
+  dragon: '🐉',
+  dark: '🌙',
+  steel: '⚙️',
+  fairy: '✨',
+};
+
 // All possible Pokemon types
 export const ALL_TYPES = [
   'normal', 'fire', 'water', 'electric', 'grass', 'ice',
@@ -30,6 +52,11 @@ export const ALL_TYPES = [
 // Get color class for a type
 export function getTypeColor(type: string): string {
   return TYPE_COLORS[type.toLowerCase()] || 'bg-gray-400';
+}
+
+// Get icon for a type
+export function getTypeIcon(type: string): string {
+  return TYPE_ICONS[type.toLowerCase()] || '⭐';
 }
 
 // Capitalize first letter
