@@ -3,6 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { getTypeColor, capitalize } from '@/lib/utils';
+import { useCompare } from '@/context/CompareContext';
+import { PokemonListItem } from '@/lib/data/pokemon';
 
 interface PokemonCardProps {
   id: number;
@@ -14,11 +16,23 @@ interface PokemonCardProps {
 
 export default function PokemonCard({ id, name, types, isFavorite, onToggleFavorite }: PokemonCardProps) {
   const imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
+  const { addToCompare, removeFromCompare, isSelected, selectedPokemon } = useCompare();
+  const isInCompare = isSelected(id);
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     onToggleFavorite(id);
+  };
+
+  const handleCompareClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isInCompare) {
+      removeFromCompare(id);
+    } else {
+      addToCompare({ id, name, types });
+    }
   };
 
   return (
@@ -49,6 +63,34 @@ export default function PokemonCard({ id, name, types, isFavorite, onToggleFavor
             strokeLinecap="round"
             strokeLinejoin="round"
             d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+          />
+        </svg>
+      </button>
+
+      {/* Compare Button */}
+      <button
+        onClick={handleCompareClick}
+        disabled={!isInCompare && selectedPokemon.length >= 3}
+        className={`absolute top-12 left-2 z-10 rounded-full p-2 hover:scale-110 transition-all ${
+          isInCompare 
+            ? 'bg-blue-500 text-white' 
+            : selectedPokemon.length >= 3
+            ? 'bg-gray-300/50 dark:bg-gray-700/50 text-gray-400 cursor-not-allowed'
+            : 'bg-white/80 dark:bg-gray-800/80 text-gray-600 dark:text-gray-300'
+        }`}
+        aria-label={isInCompare ? 'Remove from compare' : 'Add to compare'}
+      >
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
           />
         </svg>
       </button>

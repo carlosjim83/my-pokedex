@@ -1,5 +1,6 @@
 import { fetchFirstGenPokemonList, PokemonListItem } from '@/lib/data/pokemon';
 import PokemonList from '@/components/PokemonList';
+import CompareBar from '@/components/CompareBar';
 
 export default async function Home() {
   const pokemonList: PokemonListItem[] = await fetchFirstGenPokemonList();
@@ -24,9 +25,12 @@ export default async function Home() {
       </header>
 
       {/* Pokemon List with Search */}
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 py-12 pb-32">
         <PokemonList pokemonList={pokemonList} />
       </div>
+
+      {/* Compare Bar */}
+      <CompareBar />
     </main>
   );
 }
