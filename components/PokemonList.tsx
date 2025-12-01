@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { PokemonListItem } from '@/lib/data/pokemon';
 import PokemonCard from './PokemonCard';
 import PokemonListView from './PokemonListView';
+import PokemonCardSkeleton from './PokemonCardSkeleton';
+import PokemonListViewSkeleton from './PokemonListViewSkeleton';
 import SearchBar from './SearchBar';
 import TypeFilter from './TypeFilter';
 import { useFavorites } from '@/hooks/useFavorites';
@@ -250,29 +252,39 @@ export default function PokemonList({ pokemonList }: PokemonListProps) {
           {filteredPokemon.length > 0 ? (
             viewMode === 'grid' ? (
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-                {filteredPokemon.map((pokemon) => (
-                  <PokemonCard
-                    key={pokemon.id}
-                    id={pokemon.id}
-                    name={pokemon.name}
-                    types={pokemon.types}
-                    isFavorite={isFavorite(pokemon.id)}
-                    onToggleFavorite={toggleFavorite}
-                  />
-                ))}
+                {!isLoaded ? (
+                  // Show skeletons while loading favorites
+                  [...Array(12)].map((_, i) => <PokemonCardSkeleton key={i} />)
+                ) : (
+                  filteredPokemon.map((pokemon) => (
+                    <PokemonCard
+                      key={pokemon.id}
+                      id={pokemon.id}
+                      name={pokemon.name}
+                      types={pokemon.types}
+                      isFavorite={isFavorite(pokemon.id)}
+                      onToggleFavorite={toggleFavorite}
+                    />
+                  ))
+                )}
               </div>
             ) : (
               <div className="space-y-3">
-                {filteredPokemon.map((pokemon) => (
-                  <PokemonListView
-                    key={pokemon.id}
-                    id={pokemon.id}
-                    name={pokemon.name}
-                    types={pokemon.types}
-                    isFavorite={isFavorite(pokemon.id)}
-                    onToggleFavorite={toggleFavorite}
-                  />
-                ))}
+                {!isLoaded ? (
+                  // Show skeletons while loading favorites
+                  [...Array(8)].map((_, i) => <PokemonListViewSkeleton key={i} />)
+                ) : (
+                  filteredPokemon.map((pokemon) => (
+                    <PokemonListView
+                      key={pokemon.id}
+                      id={pokemon.id}
+                      name={pokemon.name}
+                      types={pokemon.types}
+                      isFavorite={isFavorite(pokemon.id)}
+                      onToggleFavorite={toggleFavorite}
+                    />
+                  ))
+                )}
               </div>
             )
           ) : (
