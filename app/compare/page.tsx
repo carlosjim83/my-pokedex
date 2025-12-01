@@ -1,6 +1,6 @@
 'use client';
 
-import { useCompare } from '@/context/CompareContext';
+import { useCompare } from '@/components/CompareContext';
 import { useEffect, useState } from 'react';
 import { fetchPokemonDetails, PokemonDetail } from '@/lib/data/pokemon';
 import Image from 'next/image';

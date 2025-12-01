@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { getTypeColor, capitalize } from '@/lib/utils';
-import { useCompare } from '@/context/CompareContext';
+import { useCompare } from '@/components/CompareContext';
 import { PokemonListItem } from '@/lib/data/pokemon';
 
 interface PokemonCardProps {
