@@ -1,5 +1,5 @@
 import { fetchFirstGenPokemonList, PokemonListItem } from '@/lib/data/pokemon';
-import PokemonCard from '@/components/PokemonCard';
+import PokemonList from '@/components/PokemonList';
 
 export default async function Home() {
   const pokemonList: PokemonListItem[] = await fetchFirstGenPokemonList();
@@ -23,13 +23,9 @@ export default async function Home() {
         </div>
       </header>
 
-      {/* Pokemon Grid */}
+      {/* Pokemon List with Search */}
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-          {pokemonList.map((pokemon) => (
-            <PokemonCard key={pokemon.id} id={pokemon.id} name={pokemon.name} />
-          ))}
-        </div>
+        <PokemonList pokemonList={pokemonList} />
       </div>
     </main>
   );
