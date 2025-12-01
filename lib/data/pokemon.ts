@@ -7,6 +7,7 @@
 export interface PokemonListItem {
   id: number;
   name: string;
+  types: string[];
 }
 
 interface PokeAPIResponse {
@@ -23,24 +24,49 @@ interface PokeAPIResponse {
  */
 export async function fetchFirstGenPokemonList(): Promise<PokemonListItem[]> {
   try {
-    const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=151&offset=0');
+    const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=151&offset=0', {
+      next: { revalidate: 3600 } // Cache for 1 hour
+    });
     if (!response.ok) {
       throw new Error('Failed to fetch Pokémon list');
     }
     const data: PokeAPIResponse = await response.json();
 
-    const pokemonList: PokemonListItem[] = data.results.map((pokemon) => {
-      const urlParts = pokemon.url.split('/');
-      const id = parseInt(urlParts[urlParts.length - 2], 10);
-      const name = pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1);
-      
-      return { id, name };
-    });
+    // Fetch all pokemon data in parallel with batching
+    const batchSize = 50;
+    const pokemonList: PokemonListItem[] = [];
+    
+    for (let i = 0; i < data.results.length; i += batchSize) {
+      const batch = data.results.slice(i, i + batchSize);
+      const batchResults = await Promise.all(
+        batch.map(async (pokemon) => {
+          const urlParts = pokemon.url.split('/');
+          const id = parseInt(urlParts[urlParts.length - 2], 10);
+          const name = pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1);
+          
+          try {
+            // Fetch individual pokemon data to get types with caching
+            const pokemonResponse = await fetch(pokemon.url, {
+              next: { revalidate: 3600 } // Cache for 1 hour
+            });
+            const pokemonData = await pokemonResponse.json();
+            const types = pokemonData.types.map((t: any) => t.type.name);
+            
+            return { id, name, types };
+          } catch (error) {
+            console.error(`Error fetching pokemon ${name}:`, error);
+            // Return with default type if fetch fails
+            return { id, name, types: ['normal'] };
+          }
+        })
+      );
+      pokemonList.push(...batchResults);
+    }
 
     return pokemonList;
   } catch (error) {
     console.error('Error fetching first generation Pokémon:', error);
-    return []; // Return an empty array or handle the error as appropriate
+    return [];
   }
 }
 
@@ -59,6 +85,7 @@ export interface PokemonDetail {
   }[];
   height: number; // in decimetres
   weight: number; // in hectograms
+  description: string;
 }
 
 /**
@@ -74,7 +101,9 @@ export async function fetchPokemonDetails(name: string): Promise<PokemonDetail |
   }
   
   try {
-    const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${name.toLowerCase()}`);
+    const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${name.toLowerCase()}`, {
+      next: { revalidate: 3600 } // Cache for 1 hour
+    });
     if (!response.ok) {
       if (response.status === 404) {
         return null; // Not found
@@ -82,6 +111,18 @@ export async function fetchPokemonDetails(name: string): Promise<PokemonDetail |
       throw new Error(`Failed to fetch Pokémon details for ${name}`);
     }
     const data = await response.json();
+
+    // Fetch species data for description
+    const speciesResponse = await fetch(data.species.url, {
+      next: { revalidate: 3600 } // Cache for 1 hour
+    });
+    const speciesData = await speciesResponse.json();
+    const englishEntry = speciesData.flavor_text_entries.find(
+      (entry: any) => entry.language.name === 'en'
+    );
+    const description = englishEntry 
+      ? englishEntry.flavor_text.replace(/\f/g, ' ').replace(/\n/g, ' ')
+      : 'No description available.';
 
     const pokemonDetail: PokemonDetail = {
       id: data.id,
@@ -94,6 +135,7 @@ export async function fetchPokemonDetails(name: string): Promise<PokemonDetail |
       })),
       height: data.height,
       weight: data.weight,
+      description,
     };
 
     return pokemonDetail;
