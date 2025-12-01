@@ -1,0 +1,39 @@
+{
+  "name": "pokeapi-openapi-client",
+  "description": "Cliente generado a partir del contrato OpenAPI de PokéAPI v2 para consumir recursos REST públicos de Pokémon.",
+  "api": {
+    "baseUrl": "https://pokeapi.co/api/v2/",
+    "methods": ["GET"],
+    "authentication": "none",
+    "fairUse": {
+      "cacheLocally": true,
+      "avoidRequestBursts": true,
+      "notes": "API gratuita y educativa; se recomienda limitar la frecuencia de peticiones."
+    }
+  },
+  "resources": {
+    "pagination": {
+      "params": ["limit", "offset"],
+      "responseFields": ["count", "next", "previous", "results"]
+    },
+    "endpoints": [
+      "/pokemon",
+      "/pokemon-species",
+      "/evolution-chain",
+      "/item",
+      "/location",
+      "/move",
+      "/berry"
+    ],
+    "identifierType": ["id", "name"]
+  },
+  "openapiClient": {
+    "specFormat": ["yaml", "json"],
+    "features": [
+      "tipado de respuestas",
+      "mapeo de endpoints REST",
+      "manejo de listas paginadas",
+      "soporte para recursos nombrados"
+    ]
+  }
+}
